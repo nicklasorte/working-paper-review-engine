@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "Comment Matrix Export",
+  "description": "Deterministic export of review comments for downstream consumption (CSV/XLSX/JSON).",
+  "type": "object",
+  "required": ["run_id", "generated_at", "format", "comments"],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "description": "Identifier linking to the review run manifest."
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the export was produced."
+    },
+    "format": {
+      "type": "string",
+      "description": "Export format (csv, xlsx, json).",
+      "enum": ["csv", "xlsx", "json"]
+    },
+    "comments": {
+      "type": "array",
+      "description": "Flattened comment records aligned to spreadsheet columns.",
+      "items": {
+        "type": "object",
+        "required": [
+          "comment_id",
+          "reviewer_persona_id",
+          "section_id",
+          "page_reference",
+          "anchor_text",
+          "comment_category",
+          "comment_text",
+          "rationale",
+          "severity",
+          "suggested_revision",
+          "confidence"
+        ],
+        "properties": {
+          "comment_id": { "type": "string" },
+          "reviewer_persona_id": { "type": "string" },
+          "section_id": { "type": "string" },
+          "page_reference": { "type": "string" },
+          "anchor_text": { "type": "string" },
+          "comment_category": { "type": "string" },
+          "comment_text": { "type": "string" },
+          "rationale": { "type": "string" },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "minor", "major", "critical"]
+          },
+          "suggested_revision": { "type": "string" },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "deduplication_key": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional export-level metadata (e.g., column order, delimiter settings).",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
