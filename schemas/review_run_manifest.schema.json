@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "Review Run Manifest",
+  "description": "Provenance and configuration for a Working Paper Review Engine run.",
+  "type": "object",
+  "required": [
+    "run_id",
+    "document_id",
+    "source_document_uri",
+    "generated_at",
+    "personas_applied",
+    "schema_versions"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "description": "Unique identifier for this review run."
+    },
+    "document_id": {
+      "type": "string",
+      "description": "Identifier of the working paper under review."
+    },
+    "source_document_uri": {
+      "type": "string",
+      "format": "uri",
+      "description": "Location of the PDF or source document."
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the run was produced (ISO 8601)."
+    },
+    "personas_applied": {
+      "type": "array",
+      "description": "Persona identifiers used during the run.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "rubric_version": {
+      "type": "string",
+      "description": "Optional version tag for the review rubric."
+    },
+    "model_version": {
+      "type": "string",
+      "description": "Optional model or ensemble version used for generation."
+    },
+    "prompt_version": {
+      "type": "string",
+      "description": "Optional prompt contract version identifier."
+    },
+    "schema_versions": {
+      "type": "object",
+      "description": "Mapping of schema names to versions used during the run.",
+      "additionalProperties": { "type": "string" }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional operator notes or caveats."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional free-form metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

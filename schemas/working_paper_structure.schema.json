@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "Working Paper Structure",
+  "description": "Structured representation of a working paper used for anchoring review comments.",
+  "type": "object",
+  "required": ["document_id", "title", "sections"],
+  "properties": {
+    "document_id": {
+      "type": "string",
+      "description": "Stable identifier for the working paper."
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of the working paper."
+    },
+    "version": {
+      "type": "string",
+      "description": "Optional version or revision tag."
+    },
+    "sections": {
+      "type": "array",
+      "description": "Ordered list of sections and nested elements.",
+      "items": {
+        "type": "object",
+        "required": ["section_id", "title", "page_range"],
+        "properties": {
+          "section_id": {
+            "type": "string",
+            "description": "Stable identifier for the section."
+          },
+          "title": {
+            "type": "string",
+            "description": "Section title."
+          },
+          "page_range": {
+            "type": "string",
+            "description": "Inclusive page range (e.g., '5-7')."
+          },
+          "elements": {
+            "type": "array",
+            "description": "Tables, figures, footnotes, recommendations, or paragraphs with anchors.",
+            "items": {
+              "type": "object",
+              "required": ["element_id", "type", "page_reference"],
+              "properties": {
+                "element_id": {
+                  "type": "string",
+                  "description": "Stable identifier for the element."
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Element type (table, figure, footnote, recommendation, paragraph)."
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Element caption or label."
+                },
+                "page_reference": {
+                  "type": "string",
+                  "description": "Location reference (page/paragraph/coordinate)."
+                },
+                "anchor_text": {
+                  "type": "string",
+                  "description": "Optional excerpt associated with the element."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional document-level metadata (e.g., authors, publication date).",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

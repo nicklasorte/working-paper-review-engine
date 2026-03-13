@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "Reviewer Persona",
+  "description": "Defines a reviewer persona configuration for the Working Paper Review Engine.",
+  "type": "object",
+  "required": [
+    "persona_id",
+    "name",
+    "role",
+    "primary_concerns",
+    "comment_patterns",
+    "evidence_standard",
+    "common_objections",
+    "avoid"
+  ],
+  "properties": {
+    "persona_id": {
+      "type": "string",
+      "description": "Stable identifier for the persona (e.g., federal-technical)."
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the persona."
+    },
+    "role": {
+      "type": "string",
+      "description": "Short description of the persona's organizational role."
+    },
+    "primary_concerns": {
+      "type": "array",
+      "description": "Focus areas the persona prioritizes.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "comment_patterns": {
+      "type": "array",
+      "description": "Typical structures or themes the persona raises.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "evidence_standard": {
+      "type": "string",
+      "description": "Evidence threshold and anchoring expectations."
+    },
+    "common_objections": {
+      "type": "array",
+      "description": "Frequent objections this persona raises.",
+      "items": { "type": "string" }
+    },
+    "avoid": {
+      "type": "array",
+      "description": "Behaviors or topics the persona should avoid.",
+      "items": { "type": "string" }
+    },
+    "tone_guidance": {
+      "type": "string",
+      "description": "Optional tone and style instructions."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional extensible metadata about the persona.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

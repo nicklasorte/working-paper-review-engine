@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "Review Comment",
+  "description": "Anchored review comment produced by the Working Paper Review Engine.",
+  "type": "object",
+  "required": [
+    "comment_id",
+    "reviewer_persona_id",
+    "section_id",
+    "page_reference",
+    "anchor_text",
+    "comment_category",
+    "comment_text",
+    "rationale",
+    "severity",
+    "suggested_revision",
+    "confidence",
+    "source_run_id"
+  ],
+  "properties": {
+    "comment_id": {
+      "type": "string",
+      "description": "Stable identifier for the comment within a run."
+    },
+    "source_run_id": {
+      "type": "string",
+      "description": "Identifier linking the comment to a review run manifest."
+    },
+    "reviewer_persona_id": {
+      "type": "string",
+      "description": "Identifier of the persona that produced the comment."
+    },
+    "section_id": {
+      "type": "string",
+      "description": "Document section or element identifier derived from the structured map."
+    },
+    "page_reference": {
+      "type": "string",
+      "description": "Human-readable page/paragraph/figure reference, e.g., 'p.7 para 3' or element locator."
+    },
+    "anchor_text": {
+      "type": "string",
+      "description": "Exact text snippet or description of the anchored element the comment references."
+    },
+    "comment_category": {
+      "type": "string",
+      "description": "Taxonomy category (e.g., technical sufficiency, reproducibility)."
+    },
+    "comment_text": {
+      "type": "string",
+      "description": "Primary comment content describing the issue."
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Reasoning that ties the comment to the anchor and persona concerns."
+    },
+    "severity": {
+      "type": "string",
+      "description": "Impact level of the issue.",
+      "enum": ["info", "minor", "major", "critical"]
+    },
+    "suggested_revision": {
+      "type": "string",
+      "description": "Actionable guidance to address the issue."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Model or reviewer confidence score between 0 and 1."
+    },
+    "deduplication_key": {
+      "type": "string",
+      "description": "Optional normalized key to aid duplicate detection."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional additional context (e.g., model version, prompt template).",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
