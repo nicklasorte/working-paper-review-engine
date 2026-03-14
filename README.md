@@ -9,6 +9,7 @@ Working papers often circulate without rigorous, structured review. Feedback is 
 - Defines contracts, schemas, prompts, and workflows for generating anchored review comment matrices from working paper PDFs.
 - Specifies reviewer personas and comment taxonomy to keep outputs consistent and auditable.
 - Provides examples, evaluation criteria, and export formats for downstream consumers.
+- Shapes exports into the Comment Resolution Engine comment-matrix contract so downstream resolution workflows ingest them without additional transformation.
 
 ## What It Does Not Do Yet
 - No executable application code or PDF parsing implementation is included.
@@ -34,7 +35,7 @@ Working papers often circulate without rigorous, structured review. Feedback is 
 
 ## Planned Outputs
 - Structured comment matrix with anchors, categories, rationale, severity, and suggested revisions
-- Export-ready CSV/XLSX-compatible tables
+- Comment Resolution Engine-compatible comment-matrix exports (XLSX primary, CSV secondary)
 - Run manifest with provenance and configuration
 - Summary statistics for the review run
 
@@ -66,6 +67,11 @@ Working papers often circulate without rigorous, structured review. Feedback is 
 - Add gold examples and baseline evaluation harness shape.
 - Define PDF structure extraction expectations for future implementation repo.
 - Document interfaces to downstream Comment Resolution and Study Artifact systems.
+
+## Comment Matrix Export
+- Default CLI flag `--output-format comment-matrix` emits the comment-matrix contract (XLSX by default; CSV optional).
+- Schema: `schemas/comment_matrix_export.schema.json` defines the column order required by the Comment Resolution Engine.
+- Sample artifact: `outputs/examples/comment_matrix_sample.xlsx` (CSV variant alongside) demonstrates the exact contract.
 
 ## Relationship to Sibling Systems
 - **Comment Resolution Engine:** downstream consumer of the review comment matrix; resolves and tracks comment closure.
