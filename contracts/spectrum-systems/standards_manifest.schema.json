@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "Standards Manifest (spectrum-systems canonical)",
+  "description": "Manifest describing contract versions sourced from the spectrum-systems repository.",
+  "type": "object",
+  "required": [
+    "artifact_type",
+    "artifact_version",
+    "schema_version",
+    "standard_source",
+    "standards_version",
+    "contract_repository",
+    "contracts",
+    "compatibility_target"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "standards_manifest",
+      "description": "Artifact discriminator for the standards manifest."
+    },
+    "artifact_version": {
+      "type": "string",
+      "description": "Manifest artifact version."
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version sourced from spectrum-systems."
+    },
+    "standard_source": {
+      "type": "string",
+      "enum": ["spectrum-systems"],
+      "description": "Canonical source repository for this manifest."
+    },
+    "standards_version": {
+      "type": "string",
+      "description": "Version tag for the canonical standards bundle."
+    },
+    "contract_repository": {
+      "type": "string",
+      "description": "Repository identifier where contracts are governed."
+    },
+    "contracts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["artifact_type", "versions"],
+        "properties": {
+          "artifact_type": { "type": "string" },
+          "versions": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "List of artifact types and supported versions."
+    },
+    "compatibility_target": {
+      "type": "string",
+      "description": "Downstream or org-level compatibility target for these contracts."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional additional compatibility or governance notes."
+    }
+  },
+  "additionalProperties": false
+}

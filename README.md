@@ -68,8 +68,15 @@ Working papers often circulate without rigorous, structured review. Feedback is 
 - Define PDF structure extraction expectations for future implementation repo.
 - Document interfaces to downstream Comment Resolution and Study Artifact systems.
 
+## Contract Alignment
+- Canonical artifact contracts are governed by the `spectrum-systems` repository; this repo consumes them and does not redefine them.
+- Contracts consumed: `working_paper_input` and `standards_manifest`.
+- Contracts produced: `reviewer_comment_set` and `provenance_record`, plus a Comment Resolution Engine-compatible matrix export.
+- Machine-readable declaration: `contracts/contract_declaration.json`; schemas are snapshotted in `contracts/spectrum-systems/`.
+- Example artifacts live in `examples/contracts/` and are validated before export.
+
 ## Comment Matrix Export
-- Default CLI flag `--output-format comment-matrix` emits the comment-matrix contract (XLSX by default; CSV optional).
+- Default CLI flag `--output-format comment-matrix` emits the comment-matrix contract (XLSX by default; CSV optional) derived from the canonical reviewer comment set.
 - Schema: `schemas/comment_matrix_export.schema.json` defines the column order required by the Comment Resolution Engine.
 - Sample artifact: `outputs/examples/comment_matrix_sample.xlsx` (CSV variant alongside) demonstrates the exact contract.
 

@@ -11,9 +11,10 @@ Design registry for spectrum and document-review automation systems. Entries are
   - Persona- and rubric-driven comment generation with anchors, categories, rationale, severity, and suggested revisions.
   - Deduplication/normalization into deterministic comment matrices.
   - Export contracts for CSV/XLSX-compatible tables and run manifests.
-- **Inputs:** Working paper PDF (required); selected reviewer personas; optional review rubric/lens; optional prior revision metadata.
-- **Outputs:** Structured comment matrix; comment records with anchors; run manifest with provenance/config; export-ready tables; summary statistics.
-- **Contracts:** `schemas/review_comment.schema.json`, `schemas/reviewer_persona.schema.json`, `schemas/working_paper_structure.schema.json`, `schemas/review_run_manifest.schema.json`, `schemas/comment_matrix_export.schema.json`.
+  - Consume canonical `working_paper_input` and `standards_manifest` contracts from `spectrum-systems`; emit canonical `reviewer_comment_set` and `provenance_record` artifacts.
+- **Inputs:** Working paper PDF (required); selected reviewer personas; optional review rubric/lens; optional prior revision metadata; `standards_manifest` reference from `spectrum-systems`.
+- **Outputs:** Structured comment matrix; canonical `reviewer_comment_set`; run manifest with provenance/config; export-ready tables; summary statistics.
+- **Contracts:** canonical snapshots in `contracts/spectrum-systems/*.schema.json` plus local schemas (`schemas/*.json`) for legacy artifacts.
 - **Evaluation Themes:** Anchor accuracy, duplication rate, actionability, persona fidelity, hallucination/false-issue rate, export completeness, comparison to historical comments when available.
 - **Downstream Consumers:** Comment Resolution Engine (resolves/triages comments), Study Artifact Generator, evaluation harnesses.
 

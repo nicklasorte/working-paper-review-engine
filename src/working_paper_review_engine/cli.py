@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import Sequence
+from typing import Mapping, Sequence
 
 from .output_contract import (
     DEFAULT_OUTPUT_FORMAT,
@@ -10,6 +10,16 @@ from .output_contract import (
     rows_from_comments,
     ensure_supported_format,
 )
+from .contracts import (
+    build_provenance_record,
+    build_reviewer_comment_set,
+    load_example_artifact,
+    validate_artifact,
+    write_json,
+)
+
+SAMPLE_RUN_ID = "review-run-sample-001"
+SAMPLE_STANDARDS_REF = "spectrum-systems/standards-manifest@2025.03-draft"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -44,14 +54,18 @@ def render_sample_comments() -> Sequence[dict]:
             "comment_text": "Clarify the propagation model assumptions in Section 2.3; current text implies free-space losses only.",
             "suggested_revision": "Specify whether clutter and diffraction losses are included in the link budget.",
             "rationale": "Anchored to p.5 para 2: the working paper cites path loss without environment class.",
-            "anchor_text": "Path loss modeled as 20log10(d) with no additional factors.",
-            "section_id": "2.3",
-            "page_reference": "5",
-            "line_reference": "14-18",
+            "location": {
+                "section": "2.3",
+                "page": "5",
+                "line": "14-18",
+                "anchor_text": "Path loss modeled as 20log10(d) with no additional factors.",
+            },
             "comment_disposition": "For consideration",
             "resolution": "Update Section 2.3 to include environmental loss factors and cite reference model.",
             "confidence": 0.78,
             "heat_level": "major",
+            "category": "clarity",
+            "status": "PROPOSED",
         }
     ]
 
@@ -66,12 +80,40 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not args.sample:
         parser.error("No action specified. Use --sample to emit a contract-aligned matrix.")
 
-    rows = rows_from_comments(
+    working_paper_input: Mapping[str, object] = load_example_artifact("working_paper_input")
+    standards_manifest: Mapping[str, object] = load_example_artifact("standards_manifest")
+    validate_artifact(working_paper_input, "working_paper_input")
+    validate_artifact(standards_manifest, "standards_manifest")
+
+    reviewer_comment_set = build_reviewer_comment_set(
         render_sample_comments(),
-        report_version="DRAFT",
+        working_paper_input,
+        SAMPLE_RUN_ID,
+        standards_manifest_ref=SAMPLE_STANDARDS_REF,
+        standards_version=str(standards_manifest.get("standards_version", "")),
+    )
+    validate_artifact(reviewer_comment_set, "reviewer_comment_set")
+
+    rows = rows_from_comments(
+        reviewer_comment_set["comments"],
+        report_version=reviewer_comment_set["working_paper_revision"],
         generation_mode=args.output_format,
     )
     export_comment_matrix(rows, output_path, args.output_format)
+
+    provenance_record = build_provenance_record(
+        reviewer_comment_set,
+        working_paper_input,
+        SAMPLE_STANDARDS_REF,
+        standards_version=str(standards_manifest.get("standards_version", "")),
+        comment_matrix_path=str(output_path),
+    )
+    validate_artifact(provenance_record, "provenance_record")
+
+    write_json(output_path.parent / "reviewer_comment_set_sample.json", reviewer_comment_set)
+    write_json(output_path.parent / "provenance_record_sample.json", provenance_record)
+    write_json(output_path.parent / "working_paper_input_sample.json", working_paper_input)
+    write_json(output_path.parent / "standards_manifest_sample.json", standards_manifest)
     return 0
 
 

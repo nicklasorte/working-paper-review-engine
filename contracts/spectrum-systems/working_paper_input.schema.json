@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "Working Paper Input (spectrum-systems canonical)",
+  "description": "Canonical ingest artifact describing a working paper input and its linkage to the standards manifest.",
+  "type": "object",
+  "required": [
+    "artifact_type",
+    "artifact_version",
+    "schema_version",
+    "standard_source",
+    "working_paper",
+    "standards_manifest_ref"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "working_paper_input",
+      "description": "Artifact discriminator for working paper input."
+    },
+    "artifact_version": {
+      "type": "string",
+      "description": "Working paper input artifact version."
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version sourced from spectrum-systems."
+    },
+    "standard_source": {
+      "type": "string",
+      "enum": ["spectrum-systems"],
+      "description": "Canonical source repository for this contract."
+    },
+    "working_paper": {
+      "type": "object",
+      "required": ["paper_id", "title", "revision"],
+      "properties": {
+        "paper_id": { "type": "string" },
+        "title": { "type": "string" },
+        "revision": { "type": "string" },
+        "source_uri": { "type": "string" },
+        "received_at": { "type": "string", "format": "date-time" },
+        "checksum_sha256": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "ingest_metadata": {
+      "type": "object",
+      "description": "Optional ingest/run metadata for traceability.",
+      "properties": {
+        "ingest_run_id": { "type": "string" },
+        "ingested_at": { "type": "string", "format": "date-time" },
+        "ingested_by": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "standards_manifest_ref": {
+      "type": "string",
+      "description": "Identifier or URI of the standards manifest used for this input."
+    }
+  },
+  "additionalProperties": false
+}

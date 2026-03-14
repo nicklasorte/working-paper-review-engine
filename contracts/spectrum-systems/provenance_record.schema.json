@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "Provenance Record (spectrum-systems canonical)",
+  "description": "Canonical provenance_record artifact aligning review runs, inputs, outputs, and standards.",
+  "type": "object",
+  "required": [
+    "artifact_type",
+    "artifact_version",
+    "schema_version",
+    "standard_source",
+    "run_id",
+    "working_paper_id",
+    "working_paper_revision",
+    "standards_manifest_ref",
+    "input_artifacts",
+    "generated_artifacts",
+    "timestamps"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "provenance_record",
+      "description": "Artifact discriminator for provenance records."
+    },
+    "artifact_version": {
+      "type": "string",
+      "description": "Provenance record artifact version."
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version sourced from spectrum-systems."
+    },
+    "standard_source": {
+      "type": "string",
+      "enum": ["spectrum-systems"],
+      "description": "Canonical source repository for this contract."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Run identifier that produced the outputs."
+    },
+    "working_paper_id": {
+      "type": "string",
+      "description": "Identifier of the working paper under review."
+    },
+    "working_paper_revision": {
+      "type": "string",
+      "description": "Revision label of the working paper that comments are anchored to."
+    },
+    "standards_manifest_ref": {
+      "type": "string",
+      "description": "Identifier or URI of the standards manifest used for this run."
+    },
+    "input_artifacts": {
+      "type": "object",
+      "required": ["working_paper_input_ref", "standards_manifest_ref"],
+      "properties": {
+        "working_paper_input_ref": { "type": "string" },
+        "standards_manifest_ref": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "generated_artifacts": {
+      "type": "object",
+      "required": ["reviewer_comment_set_ref"],
+      "properties": {
+        "reviewer_comment_set_ref": { "type": "string" },
+        "comment_matrix_export": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "timestamps": {
+      "type": "object",
+      "required": ["started_at", "completed_at"],
+      "properties": {
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "source_repo": {
+      "type": "string",
+      "description": "Repository that generated this provenance record."
+    },
+    "source_repo_version": {
+      "type": "string",
+      "description": "Commit or tag of the repository."
+    },
+    "tool_metadata": {
+      "type": "object",
+      "description": "Optional tool/model metadata used during the run.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

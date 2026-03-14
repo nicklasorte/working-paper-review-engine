@@ -1,0 +1,16 @@
+{
+  "artifact_type": "standards_manifest",
+  "artifact_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "standard_source": "spectrum-systems",
+  "standards_version": "2025.03-draft",
+  "contract_repository": "spectrum-systems",
+  "contracts": [
+    { "artifact_type": "working_paper_input", "versions": ["1.0.0"] },
+    { "artifact_type": "standards_manifest", "versions": ["1.0.0"] },
+    { "artifact_type": "reviewer_comment_set", "versions": ["1.0.0"] },
+    { "artifact_type": "provenance_record", "versions": ["1.0.0"] }
+  ],
+  "compatibility_target": "czar/working-paper-review-engine@1.x",
+  "notes": "Snapshot of canonical contracts sourced from spectrum-systems."
+}
