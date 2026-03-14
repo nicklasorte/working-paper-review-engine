@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "repo_role": "engine_repo",
+  "contract_mode": "consume_and_produce",
+  "standards_source_repo": "spectrum-systems",
+  "standards_manifest_ref": "spectrum-systems/standards-manifest@2025.03-draft",
+  "consumed_artifact_types": [
+    "working_paper_input",
+    "standards_manifest"
+  ],
+  "produced_artifact_types": [
+    "reviewer_comment_set",
+    "provenance_record"
+  ],
+  "supported_contract_versions": {
+    "working_paper_input": [
+      "1.0.0"
+    ],
+    "standards_manifest": [
+      "1.0.0"
+    ],
+    "reviewer_comment_set": [
+      "1.0.0"
+    ],
+    "provenance_record": [
+      "1.0.0"
+    ]
+  },
+  "standards_compatibility_target": "czar/working-paper-review-engine@1.x",
+  "notes": "This repository consumes canonical contracts governed by spectrum-systems and emits reviewer_comment_set and provenance_record artifacts.",
+  "last_synced": "2026-03-14T00:00:00Z"
+}

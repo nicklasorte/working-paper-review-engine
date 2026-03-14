@@ -1,0 +1,43 @@
+{
+  "artifact_type": "reviewer_comment_set",
+  "artifact_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "standard_source": "spectrum-systems",
+  "review_run_id": "review-run-sample-001",
+  "working_paper_id": "wp-2024-001",
+  "working_paper_revision": "DRAFT-1",
+  "standards_manifest_ref": "spectrum-systems/standards-manifest@2025.03-draft",
+  "comments": [
+    {
+      "comment_id": "comment-1",
+      "comment_number": 1,
+      "reviewer_persona_id": "NTIA engineer",
+      "comment_text": "Clarify the propagation model assumptions in Section 2.3; current text implies free-space losses only.",
+      "suggested_revision": "Specify whether clutter and diffraction losses are included in the link budget.",
+      "rationale": "Anchored to p.5 para 2: the working paper cites path loss without environment class.",
+      "category": "clarity",
+      "severity": "major",
+      "status": "PROPOSED",
+      "location": {
+        "section": "2.3",
+        "page": "5",
+        "line": "14-18",
+        "anchor_text": "Path loss modeled as 20log10(d) with no additional factors."
+      },
+      "working_paper_references": {
+        "paper_id": "wp-2024-001",
+        "revision": "DRAFT-1"
+      },
+      "trace": {
+        "provenance_record_id": "prov-review-run-sample-001",
+        "source": "working-paper-review-engine",
+        "standards_version": "2025.03-draft",
+        "run_id": "review-run-sample-001"
+      }
+    }
+  ],
+  "metadata": {
+    "reviewer_personas": ["NTIA engineer"],
+    "format": "reviewer_comment_set"
+  }
+}

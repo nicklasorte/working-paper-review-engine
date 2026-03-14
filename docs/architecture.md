@@ -4,14 +4,16 @@
 - This repository defines contracts, schemas, prompts, and workflows for the Working Paper Review Engine.
 - No application runtime, model orchestration, or PDF parsing code lives here; those belong in the future implementation repo.
 - All outputs must be export-ready and align to published schemas.
+- Canonical contracts are governed by `spectrum-systems`; this repo consumes them and emits only contract-conformant artifacts.
 
 ## Upstream Dependencies
 - Working paper PDF (canonical source document).
 - Optional metadata: revision history, authorship, intended audience, known issues.
 - Selected reviewer personas and optional rubric definitions.
+- Standards manifest sourced from `spectrum-systems` declaring compatible contract versions.
 
 ## Downstream Dependencies
-- Comment Resolution Engine (consumes structured comment matrix).
+- Comment Resolution Engine (consumes structured comment matrix derived from the canonical reviewer_comment_set).
 - Study Artifact Generator (consumes resolved comments and document structure).
 - Evaluation harnesses for regression and persona fidelity checks.
 

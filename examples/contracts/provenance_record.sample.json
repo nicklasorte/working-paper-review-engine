@@ -1,0 +1,28 @@
+{
+  "artifact_type": "provenance_record",
+  "artifact_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "standard_source": "spectrum-systems",
+  "run_id": "review-run-sample-001",
+  "working_paper_id": "wp-2024-001",
+  "working_paper_revision": "DRAFT-1",
+  "standards_manifest_ref": "spectrum-systems/standards-manifest@2025.03-draft",
+  "input_artifacts": {
+    "working_paper_input_ref": "wp-2024-001",
+    "standards_manifest_ref": "spectrum-systems/standards-manifest@2025.03-draft"
+  },
+  "generated_artifacts": {
+    "reviewer_comment_set_ref": "review-run-sample-001#reviewer_comment_set",
+    "comment_matrix_export": "outputs/examples/comment_matrix_sample.xlsx"
+  },
+  "timestamps": {
+    "started_at": "2025-02-10T00:05:00Z",
+    "completed_at": "2025-02-10T00:06:00Z"
+  },
+  "source_repo": "working-paper-review-engine",
+  "source_repo_version": "spec-only",
+  "tool_metadata": {
+    "runner": "cli-sample",
+    "model": "none"
+  }
+}

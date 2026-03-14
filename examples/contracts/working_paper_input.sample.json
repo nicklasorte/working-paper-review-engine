@@ -1,0 +1,19 @@
+{
+  "artifact_type": "working_paper_input",
+  "artifact_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "standard_source": "spectrum-systems",
+  "working_paper": {
+    "paper_id": "wp-2024-001",
+    "title": "5G Coexistence Study Draft",
+    "revision": "DRAFT-1",
+    "source_uri": "s3://spec/working-papers/wp-2024-001-draft.pdf",
+    "received_at": "2025-02-10T00:00:00Z"
+  },
+  "ingest_metadata": {
+    "ingest_run_id": "ingest-sample-001",
+    "ingested_at": "2025-02-10T00:05:00Z",
+    "ingested_by": "working-paper-review-engine"
+  },
+  "standards_manifest_ref": "spectrum-systems/standards-manifest@2025.03-draft"
+}

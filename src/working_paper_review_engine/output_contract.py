@@ -118,16 +118,37 @@ class CommentMatrixRow:
         Map a synthetic review comment (aligned to review_comment.schema.json) into the
         comment-matrix contract.
         """
-        agency_notes = comment.get("comment_text") or comment.get("agency_notes") or ""
-        suggested = comment.get("suggested_revision") or comment.get("agency_suggested_text_change") or ""
+        location = comment.get("location") or {}
+        agency_notes = (
+            comment.get("comment_text")
+            or comment.get("text")
+            or comment.get("agency_notes")
+            or ""
+        )
+        suggested = (
+            comment.get("suggested_revision")
+            or comment.get("suggested_action")
+            or comment.get("agency_suggested_text_change")
+            or ""
+        )
         disposition = comment.get("disposition") or comment.get("comment_disposition") or ""
         resolution = comment.get("resolution") or ""
-        report_context = comment.get("anchor_text") or comment.get("report_context") or ""
+        report_context = (
+            location.get("anchor_text")
+            or comment.get("anchor_text")
+            or comment.get("report_context")
+            or ""
+        )
         ntia_comments = comment.get("rationale") or comment.get("ntia_comments") or ""
-        section = comment.get("section_id") or comment.get("section") or ""
-        page = comment.get("page_reference") or comment.get("page") or ""
-        line = comment.get("line_reference") or comment.get("line") or ""
-        intent = comment.get("intent_classification") or comment.get("comment_category") or ""
+        section = location.get("section") or comment.get("section_id") or comment.get("section") or ""
+        page = location.get("page") or comment.get("page_reference") or comment.get("page") or ""
+        line = location.get("line") or comment.get("line_reference") or comment.get("line") or ""
+        intent = (
+            comment.get("intent_classification")
+            or comment.get("comment_category")
+            or comment.get("category")
+            or ""
+        )
         heat_level = comment.get("severity") or comment.get("heat_level") or ""
         resolved_against = comment.get("resolved_against_revision") or report_version
         matched_rule_types = comment.get("matched_rule_types") or ""

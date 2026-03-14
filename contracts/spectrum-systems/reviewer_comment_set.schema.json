@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "title": "Reviewer Comment Set (spectrum-systems canonical)",
+  "description": "Canonical reviewer_comment_set artifact consumed and produced by engine repos.",
+  "type": "object",
+  "required": [
+    "artifact_type",
+    "artifact_version",
+    "schema_version",
+    "standard_source",
+    "review_run_id",
+    "working_paper_id",
+    "working_paper_revision",
+    "standards_manifest_ref",
+    "comments"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "reviewer_comment_set",
+      "description": "Artifact discriminator for reviewer comment sets."
+    },
+    "artifact_version": {
+      "type": "string",
+      "description": "Reviewer comment set artifact version."
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version sourced from spectrum-systems."
+    },
+    "standard_source": {
+      "type": "string",
+      "enum": ["spectrum-systems"],
+      "description": "Canonical source repository for this contract."
+    },
+    "review_run_id": {
+      "type": "string",
+      "description": "Identifier for the review run that generated this set."
+    },
+    "working_paper_id": {
+      "type": "string",
+      "description": "Identifier of the working paper under review."
+    },
+    "working_paper_revision": {
+      "type": "string",
+      "description": "Revision label of the working paper that comments are anchored to."
+    },
+    "standards_manifest_ref": {
+      "type": "string",
+      "description": "Identifier or URI of the standards manifest used for this run."
+    },
+    "comments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "comment_id",
+          "comment_number",
+          "reviewer_persona_id",
+          "comment_text",
+          "category",
+          "severity",
+          "status",
+          "location",
+          "trace"
+        ],
+        "properties": {
+          "comment_id": { "type": "string" },
+          "comment_number": { "type": ["integer", "string"] },
+          "reviewer_persona_id": { "type": "string" },
+          "comment_text": { "type": "string" },
+          "suggested_revision": { "type": "string" },
+          "rationale": { "type": "string" },
+          "category": { "type": "string" },
+          "severity": { "type": "string" },
+          "status": { "type": "string" },
+          "location": {
+            "type": "object",
+            "required": ["section", "page"],
+            "properties": {
+              "section": { "type": "string" },
+              "page": { "type": "string" },
+              "line": { "type": "string" },
+              "anchor_text": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "working_paper_references": {
+            "type": "object",
+            "properties": {
+              "paper_id": { "type": "string" },
+              "revision": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "trace": {
+            "type": "object",
+            "required": ["provenance_record_id", "source", "standards_version"],
+            "properties": {
+              "provenance_record_id": { "type": "string" },
+              "source": { "type": "string" },
+              "standards_version": { "type": "string" },
+              "run_id": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional extra context such as reviewer set or rubric identifiers.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
