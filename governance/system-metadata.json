@@ -1,0 +1,30 @@
+{
+  "system_id": "working-paper-review-engine",
+  "repo_name": "nicklasorte/working-paper-review-engine",
+  "repo_type": "operational-engine",
+  "architecture_layer": "review-generation",
+  "governance_source": "spectrum-systems",
+  "status": "spec-first",
+  "description": "Ingests working paper PDFs and generates structured, anchored review comment matrices from configurable reviewer personas. Produces canonical reviewer_comment_set and provenance_record artifacts compatible with the Comment Resolution Engine.",
+  "contracts_consumed": [
+    "working_paper_input@1.0.0",
+    "standards_manifest@1.0.0"
+  ],
+  "contracts_produced": [
+    "reviewer_comment_set@1.0.0",
+    "provenance_record@1.0.0"
+  ],
+  "contract_declaration_path": "contracts/contract_declaration.json",
+  "governance_declaration_path": "governance/governance-declaration.json",
+  "evaluation_manifest_path": "evals/eval-manifest.json",
+  "sibling_engines": [
+    "comment-resolution-engine",
+    "study-artifact-generator",
+    "transcript-to-issue-engine"
+  ],
+  "upstream": [],
+  "downstream": [
+    "comment-resolution-engine",
+    "study-artifact-generator"
+  ]
+}

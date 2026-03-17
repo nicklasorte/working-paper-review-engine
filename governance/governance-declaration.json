@@ -1,0 +1,26 @@
+{
+  "governance_declaration_version": "1.0.0",
+  "system_id": "working-paper-review-engine",
+  "implementation_repo": "nicklasorte/working-paper-review-engine",
+  "architecture_source": "spectrum-systems",
+  "contract_pins": {
+    "working_paper_input": "1.0.0",
+    "standards_manifest": "1.0.0",
+    "reviewer_comment_set": "1.0.0",
+    "provenance_record": "1.0.0"
+  },
+  "schema_pins": {
+    "review_comment": "schemas/review_comment.schema.json",
+    "review_run_manifest": "schemas/review_run_manifest.schema.json",
+    "reviewer_persona": "schemas/reviewer_persona.schema.json",
+    "working_paper_structure": "schemas/working_paper_structure.schema.json",
+    "comment_matrix_export": "schemas/comment_matrix_export.schema.json"
+  },
+  "rule_version": "2025.03-draft",
+  "prompt_set_hash": "prompts/system-review-prompt.md,prompts/persona-federal-technical.md,prompts/persona-fcc-regulatory.md,prompts/persona-industry-ctia.md",
+  "prompt_set_hash_note": "Stored as canonical file list pending prompt stabilization. Replace with SHA-256 hash of concatenated prompt content when prompts are finalized.",
+  "evaluation_manifest_path": "evals/eval-manifest.json",
+  "last_evaluation_date": null,
+  "external_storage_policy": "no-external-calls",
+  "notes": "Governance authority remains with spectrum-systems. This declaration tracks local pinned versions and evaluation readiness."
+}
