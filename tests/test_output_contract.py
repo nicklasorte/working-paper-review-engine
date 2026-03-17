@@ -7,7 +7,10 @@ import openpyxl
 
 from working_paper_review_engine.output_contract import (
     COMMENT_MATRIX_COLUMNS,
+    COMMENT_MATRIX_SHEET_NAME,
+    COMMENT_TYPE_VALUES,
     CommentMatrixRow,
+    infer_comment_type,
     rows_from_comments,
     rows_to_csv,
     rows_to_xlsx,
@@ -15,7 +18,8 @@ from working_paper_review_engine.output_contract import (
 
 
 class OutputContractTests(unittest.TestCase):
-    def test_column_order_matches_contract(self) -> None:
+    def test_column_order_matches_canonical_contract(self) -> None:
+        """COMMENT_MATRIX_COLUMNS must exactly match the spectrum-systems 13-column contract."""
         expected = [
             "Comment Number",
             "Reviewer Initials",
@@ -24,33 +28,29 @@ class OutputContractTests(unittest.TestCase):
             "Section",
             "Page",
             "Line",
+            "Comment Type: Editorial/Grammar, Clarification, Technical",
             "Agency Notes",
             "Agency Suggested Text Change",
-            "WG Chain Comments",
             "NTIA Comments",
             "Comment Disposition",
             "Resolution",
-            "Report Context",
-            "Resolution Task",
-            "Comment Cluster Id",
-            "Intent Classification",
-            "Section Group",
-            "Heat Level",
-            "Validation Status",
-            "Validation Notes",
-            "Resolved Against Revision",
-            "Generation Mode",
-            "Rule Id",
-            "Rule Source",
-            "Rule Version",
-            "Rules Profile",
-            "Rules Profile Version",
-            "Matched Rule Types",
-            "Review Status",
-            "Confidence Score",
-            "Provenance Record Id",
         ]
         self.assertEqual(COMMENT_MATRIX_COLUMNS, expected)
+
+    def test_column_count_is_exactly_thirteen(self) -> None:
+        """No extra visible columns beyond the 13 canonical ones."""
+        self.assertEqual(len(COMMENT_MATRIX_COLUMNS), 13)
+
+    def test_comment_type_values_are_canonical(self) -> None:
+        """Allowed Comment Type values must match the spectrum-systems contract exactly."""
+        self.assertEqual(
+            sorted(COMMENT_TYPE_VALUES),
+            sorted(["Editorial/Grammar", "Clarification", "Technical"]),
+        )
+
+    def test_sheet_name_is_canonical(self) -> None:
+        """Sheet name must be 'Comment Resolution Matrix' per the spectrum-systems contract."""
+        self.assertEqual(COMMENT_MATRIX_SHEET_NAME, "Comment Resolution Matrix")
 
     def test_rows_serialize_to_csv_and_xlsx(self) -> None:
         comment = {
@@ -63,6 +63,7 @@ class OutputContractTests(unittest.TestCase):
             "section_id": "1.1",
             "page_reference": "3",
             "line_reference": "5-8",
+            "comment_type": "Clarification",
             "comment_disposition": "For consideration",
             "resolution": "Update wording and cite CFR Part 2.104(d).",
             "confidence": 0.64,
@@ -81,27 +82,55 @@ class OutputContractTests(unittest.TestCase):
         self.assertEqual(header, COMMENT_MATRIX_COLUMNS)
         agency_notes_idx = COMMENT_MATRIX_COLUMNS.index("Agency Notes")
         suggested_idx = COMMENT_MATRIX_COLUMNS.index("Agency Suggested Text Change")
+        comment_type_idx = COMMENT_MATRIX_COLUMNS.index(
+            "Comment Type: Editorial/Grammar, Clarification, Technical"
+        )
         self.assertEqual(row[agency_notes_idx], comment["comment_text"])
         self.assertEqual(row[suggested_idx], comment["suggested_revision"])
+        self.assertEqual(row[comment_type_idx], "Clarification")
 
         workbook = openpyxl.load_workbook(xlsx_path)
-        sheet = workbook.active
+        self.assertIn(COMMENT_MATRIX_SHEET_NAME, workbook.sheetnames)
+        sheet = workbook[COMMENT_MATRIX_SHEET_NAME]
         header_row = [cell.value for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
         self.assertEqual(header_row, COMMENT_MATRIX_COLUMNS)
         value_row = [cell.value for cell in next(sheet.iter_rows(min_row=2, max_row=2))]
         disposition_idx = COMMENT_MATRIX_COLUMNS.index("Comment Disposition")
         self.assertEqual(value_row[disposition_idx], comment["comment_disposition"])
 
-    def test_defaults_fill_required_fields(self) -> None:
+    def test_no_extra_columns_in_ordered_mapping(self) -> None:
+        """to_ordered_mapping must emit exactly the 13 canonical columns and nothing else."""
         row = CommentMatrixRow(
             comment_number=1,
             persona_name="DoD spectrum engineer",
             agency_notes="Sample",
         ).to_ordered_mapping()
-        self.assertEqual(row["Validation Status"], "NOT_VALIDATED")
-        self.assertEqual(row["WG Chain Comments"], "")
-        self.assertTrue(row["Rule Id"])
-        self.assertEqual(row["Generation Mode"], "comment-matrix")
+        self.assertEqual(list(row.keys()), COMMENT_MATRIX_COLUMNS)
+
+    def test_infer_comment_type_technical(self) -> None:
+        self.assertEqual(infer_comment_type("technical sufficiency"), "Technical")
+        self.assertEqual(infer_comment_type("reproducibility"), "Technical")
+        self.assertEqual(infer_comment_type("technical"), "Technical")
+
+    def test_infer_comment_type_clarification(self) -> None:
+        self.assertEqual(infer_comment_type("regulatory ambiguity"), "Clarification")
+        self.assertEqual(infer_comment_type("clarity"), "Clarification")
+        self.assertEqual(infer_comment_type("clarification"), "Clarification")
+
+    def test_infer_comment_type_editorial(self) -> None:
+        self.assertEqual(infer_comment_type("inconsistent terminology"), "Editorial/Grammar")
+        self.assertEqual(infer_comment_type("editorial"), "Editorial/Grammar")
+
+    def test_infer_comment_type_blank_on_unknown(self) -> None:
+        """Unknown category with no severity should return empty string (not fabricate a type)."""
+        self.assertEqual(infer_comment_type(""), "")
+        self.assertEqual(infer_comment_type("unknown-random-category"), "")
+
+    def test_infer_comment_type_fallback_by_severity(self) -> None:
+        self.assertEqual(infer_comment_type("", "critical"), "Technical")
+        self.assertEqual(infer_comment_type("", "major"), "Technical")
+        self.assertEqual(infer_comment_type("", "minor"), "Clarification")
+        self.assertEqual(infer_comment_type("", "info"), "Clarification")
 
 
 if __name__ == "__main__":  # pragma: no cover

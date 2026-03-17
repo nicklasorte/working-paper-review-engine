@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "Comment Matrix Export",
-  "description": "Deterministic export of review comments aligned to the Comment Resolution Engine comment-matrix contract.",
+  "description": "Deterministic export aligned to the canonical 13-column Comment Resolution Matrix spreadsheet contract governed by spectrum-systems. No extra visible columns are permitted; internal metadata travels in sidecar files.",
   "type": "object",
   "required": ["run_id", "generated_at", "format", "comments"],
   "properties": {
@@ -21,7 +21,7 @@
     },
     "comments": {
       "type": "array",
-      "description": "Flattened comment records aligned to the Comment Resolution Engine spreadsheet columns.",
+      "description": "Rows aligned to the canonical 13-column Comment Resolution Matrix spreadsheet contract from spectrum-systems.",
       "items": {
         "type": "object",
         "required": [
@@ -32,31 +32,12 @@
           "Section",
           "Page",
           "Line",
+          "Comment Type: Editorial/Grammar, Clarification, Technical",
           "Agency Notes",
           "Agency Suggested Text Change",
-          "WG Chain Comments",
           "NTIA Comments",
           "Comment Disposition",
-          "Resolution",
-          "Report Context",
-          "Resolution Task",
-          "Comment Cluster Id",
-          "Intent Classification",
-          "Section Group",
-          "Heat Level",
-          "Validation Status",
-          "Validation Notes",
-          "Resolved Against Revision",
-          "Generation Mode",
-          "Rule Id",
-          "Rule Source",
-          "Rule Version",
-          "Rules Profile",
-          "Rules Profile Version",
-          "Matched Rule Types",
-          "Review Status",
-          "Confidence Score",
-          "Provenance Record Id"
+          "Resolution"
         ],
         "properties": {
           "Comment Number": { "type": ["string", "integer"] },
@@ -65,46 +46,27 @@
           "Report Version": { "type": "string" },
           "Section": { "type": "string" },
           "Page": { "type": "string" },
-          "Line": { "type": "string" },
+          "Line": {
+            "type": "string",
+            "description": "Visible left-margin line number or range from the PDF working paper (e.g., '42', '42-45', '42, 46')."
+          },
+          "Comment Type: Editorial/Grammar, Clarification, Technical": {
+            "type": "string",
+            "enum": ["Editorial/Grammar", "Clarification", "Technical", ""],
+            "description": "Canonical comment type. Allowed values: Editorial/Grammar, Clarification, Technical."
+          },
           "Agency Notes": { "type": "string" },
           "Agency Suggested Text Change": { "type": "string" },
-          "WG Chain Comments": { "type": "string" },
           "NTIA Comments": { "type": "string" },
           "Comment Disposition": { "type": "string" },
-          "Resolution": { "type": "string" },
-          "Report Context": { "type": "string" },
-          "Resolution Task": { "type": "string" },
-          "Comment Cluster Id": { "type": "string" },
-          "Intent Classification": { "type": "string" },
-          "Section Group": { "type": "string" },
-          "Heat Level": { "type": "string" },
-          "Validation Status": {
-            "type": "string",
-            "enum": ["NOT_VALIDATED", "VALIDATED", "REJECTED", "FLAGGED"]
-          },
-          "Validation Notes": { "type": "string" },
-          "Resolved Against Revision": { "type": "string" },
-          "Generation Mode": { "type": "string" },
-          "Rule Id": { "type": "string" },
-          "Rule Source": { "type": "string" },
-          "Rule Version": { "type": "string" },
-          "Rules Profile": { "type": "string" },
-          "Rules Profile Version": { "type": "string" },
-          "Matched Rule Types": { "type": "string" },
-          "Review Status": { "type": "string" },
-          "Confidence Score": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1
-          },
-          "Provenance Record Id": { "type": "string" }
+          "Resolution": { "type": "string" }
         },
         "additionalProperties": false
       }
     },
     "metadata": {
       "type": "object",
-      "description": "Optional export-level metadata (e.g., column order, delimiter settings).",
+      "description": "Optional export-level metadata (e.g., column order, delimiter settings). Must not appear as a visible spreadsheet column.",
       "additionalProperties": true
     }
   },

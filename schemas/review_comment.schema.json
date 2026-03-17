@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "Review Comment",
-  "description": "Anchored review comment produced by the Working Paper Review Engine.",
+  "description": "Anchored review comment produced by the Working Paper Review Engine from a numbered PDF working paper. Comments must be anchored to a specific section, page, and — where determinable — the visible left-margin line number printed on the PDF page.",
   "type": "object",
   "required": [
     "comment_id",
@@ -10,6 +10,7 @@
     "page_reference",
     "anchor_text",
     "comment_category",
+    "comment_type",
     "comment_text",
     "rationale",
     "severity",
@@ -30,21 +31,38 @@
       "type": "string",
       "description": "Identifier of the persona that produced the comment."
     },
+    "reviewer_initials": {
+      "type": "string",
+      "description": "Compact reviewer attribution used in the canonical matrix Reviewer Initials column."
+    },
+    "agency": {
+      "type": "string",
+      "description": "Submitting agency, mapped to the canonical matrix Agency column."
+    },
     "section_id": {
       "type": "string",
-      "description": "Document section or element identifier derived from the structured map."
+      "description": "Document section number or title derived from visible headings in the PDF."
     },
     "page_reference": {
       "type": "string",
-      "description": "Human-readable page/paragraph/figure reference, e.g., 'p.7 para 3' or element locator."
+      "description": "Page number of the PDF on which the comment is anchored."
+    },
+    "line": {
+      "type": "string",
+      "description": "Visible left-margin line number(s) on the PDF page. Allowed formats: single number ('42'), range ('42-45'), or list ('42, 46'). Leave blank only when the line number is genuinely unresolvable; never infer from paragraph position."
     },
     "anchor_text": {
       "type": "string",
-      "description": "Exact text snippet or description of the anchored element the comment references."
+      "description": "Exact text snippet from the PDF that the comment references."
     },
     "comment_category": {
       "type": "string",
-      "description": "Taxonomy category (e.g., technical sufficiency, reproducibility)."
+      "description": "Taxonomy category (e.g., technical sufficiency, reproducibility, regulatory ambiguity)."
+    },
+    "comment_type": {
+      "type": "string",
+      "enum": ["Editorial/Grammar", "Clarification", "Technical"],
+      "description": "Canonical Comment Type value from the spectrum-systems spreadsheet contract. Must be one of: Editorial/Grammar, Clarification, Technical."
     },
     "comment_text": {
       "type": "string",
@@ -61,7 +79,7 @@
     },
     "suggested_revision": {
       "type": "string",
-      "description": "Actionable guidance to address the issue."
+      "description": "Actionable guidance or proposed replacement language to address the issue."
     },
     "confidence": {
       "type": "number",

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema#",
   "title": "Working Paper Input (spectrum-systems canonical)",
-  "description": "Canonical ingest artifact describing a working paper input and its linkage to the standards manifest.",
+  "description": "Canonical ingest artifact describing a working paper input and its linkage to the standards manifest. The working paper must be a PDF with visible line numbers printed on the left margin of each page; these left-margin line numbers are the anchor system for generated review comments.",
   "type": "object",
   "required": [
     "artifact_type",
@@ -31,12 +31,21 @@
     },
     "working_paper": {
       "type": "object",
-      "required": ["paper_id", "title", "revision"],
+      "required": ["paper_id", "title", "revision", "source_uri"],
+      "description": "Metadata for the PDF working paper under review. source_uri must point to the numbered PDF file.",
       "properties": {
         "paper_id": { "type": "string" },
         "title": { "type": "string" },
         "revision": { "type": "string" },
-        "source_uri": { "type": "string" },
+        "source_uri": {
+          "type": "string",
+          "description": "URI of the numbered PDF working paper (required). The PDF must have visible line numbers on the left margin of each page."
+        },
+        "has_line_numbers": {
+          "type": "boolean",
+          "default": true,
+          "description": "Indicates that the PDF has visible left-margin line numbers. Must be true for the line anchor contract to apply. If false or absent, the engine must fall back to page+section anchors only and mark line fields blank."
+        },
         "received_at": { "type": "string", "format": "date-time" },
         "checksum_sha256": { "type": "string" }
       },

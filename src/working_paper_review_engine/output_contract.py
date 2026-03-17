@@ -14,7 +14,9 @@ except ImportError as exc:  # pragma: no cover - surfaced in tests
         "Install with `pip install openpyxl`."
     ) from exc
 
-# Canonical column order from the Comment Resolution Engine contract.
+# Canonical 13-column header list governed by spectrum-systems.
+# Source: docs/comment-resolution-matrix-spreadsheet-contract.md
+# Order and spelling are IMMUTABLE; do not rename or reorder.
 COMMENT_MATRIX_COLUMNS: List[str] = [
     "Comment Number",
     "Reviewer Initials",
@@ -23,32 +25,19 @@ COMMENT_MATRIX_COLUMNS: List[str] = [
     "Section",
     "Page",
     "Line",
+    "Comment Type: Editorial/Grammar, Clarification, Technical",
     "Agency Notes",
     "Agency Suggested Text Change",
-    "WG Chain Comments",
     "NTIA Comments",
     "Comment Disposition",
     "Resolution",
-    "Report Context",
-    "Resolution Task",
-    "Comment Cluster Id",
-    "Intent Classification",
-    "Section Group",
-    "Heat Level",
-    "Validation Status",
-    "Validation Notes",
-    "Resolved Against Revision",
-    "Generation Mode",
-    "Rule Id",
-    "Rule Source",
-    "Rule Version",
-    "Rules Profile",
-    "Rules Profile Version",
-    "Matched Rule Types",
-    "Review Status",
-    "Confidence Score",
-    "Provenance Record Id",
 ]
+
+# Allowed values for "Comment Type: Editorial/Grammar, Clarification, Technical".
+COMMENT_TYPE_VALUES: List[str] = ["Editorial/Grammar", "Clarification", "Technical"]
+
+# Sheet name required by the spectrum-systems spreadsheet contract.
+COMMENT_MATRIX_SHEET_NAME = "Comment Resolution Matrix"
 
 DEFAULT_OUTPUT_FORMAT = "comment-matrix"
 
@@ -58,6 +47,27 @@ PERSONA_IDENTITY_MAP: Mapping[str, Tuple[str, str]] = {
     "FCC policy analyst": ("FCC", "FCC"),
     "DoD spectrum engineer": ("DoD", "DOD"),
     "Industry / CTIA-style reviewer": ("Industry", "CTIA"),
+}
+
+# Internal category → canonical Comment Type mapping.
+# Categories not listed default to "Clarification".
+_CATEGORY_COMMENT_TYPE_MAP: Mapping[str, str] = {
+    "technical sufficiency": "Technical",
+    "reproducibility": "Technical",
+    "unsupported assertion": "Technical",
+    "missing evidence/citation": "Technical",
+    "missing operational detail": "Technical",
+    "fairness/deployment burden": "Technical",
+    "regulatory ambiguity": "Clarification",
+    "policy overreach": "Clarification",
+    "unclear recommendation": "Clarification",
+    "inconsistent terminology": "Editorial/Grammar",
+    # short aliases
+    "technical": "Technical",
+    "clarity": "Clarification",
+    "editorial": "Editorial/Grammar",
+    "grammar": "Editorial/Grammar",
+    "clarification": "Clarification",
 }
 
 
@@ -71,39 +81,52 @@ def map_persona_identity(persona_name: str) -> Tuple[str, str]:
     )
 
 
+def infer_comment_type(category: str, severity: str = "") -> str:
+    """
+    Map an internal category or severity to a canonical Comment Type value.
+
+    Canonical values (from spectrum-systems): Editorial/Grammar, Clarification, Technical.
+    Returns "" when the input is blank, so the matrix cell remains blank rather than
+    fabricating a classification.
+    """
+    lookup = (category or "").lower().strip()
+    if lookup in _CATEGORY_COMMENT_TYPE_MAP:
+        return _CATEGORY_COMMENT_TYPE_MAP[lookup]
+    sev = (severity or "").lower().strip()
+    if sev in ("critical", "major"):
+        return "Technical"
+    if sev in ("minor", "info"):
+        return "Clarification"
+    return ""
+
+
 @dataclass
 class CommentMatrixRow:
+    """
+    Internal row object that maps to the canonical 13-column comment resolution matrix.
+
+    The visible spreadsheet export (to_ordered_mapping) emits ONLY the canonical 13
+    columns governed by spectrum-systems.  Extra internal fields (confidence_score,
+    provenance_record_id, etc.) are preserved here for sidecar/provenance use.
+    """
+
     comment_number: Any
     persona_name: str
     agency_notes: str
     agency_suggested_text_change: str = ""
+    comment_type: str = ""
     comment_disposition: str = ""
     resolution: str = ""
-    report_context: str = ""
     ntia_comments: str = ""
     report_version: str = "DRAFT"
     section: str = ""
     page: str = ""
     line: str = ""
-    resolution_task: str = ""
-    comment_cluster_id: str = ""
-    intent_classification: str = ""
-    section_group: str = ""
-    heat_level: str = ""
-    validation_status: str = "NOT_VALIDATED"
-    validation_notes: str = ""
-    resolved_against_revision: str = "UNSPECIFIED"
-    generation_mode: str = DEFAULT_OUTPUT_FORMAT
-    rule_id: str = "rule-placeholder"
-    rule_source: str = "working-paper-review-engine"
-    rule_version: str = "0.0.0"
-    rules_profile: str = "default"
-    rules_profile_version: str = "0.0.0"
-    matched_rule_types: str = ""
-    review_status: str = "PROPOSED"
+    # Internal metadata — not written to the visible canonical sheet.
     confidence_score: float = 0.0
     provenance_record_id: str = ""
-    wg_chain_comments: str = ""
+    heat_level: str = ""
+    generation_mode: str = DEFAULT_OUTPUT_FORMAT
 
     @classmethod
     def from_generated_comment(
@@ -116,7 +139,7 @@ class CommentMatrixRow:
     ) -> "CommentMatrixRow":
         """
         Map a synthetic review comment (aligned to review_comment.schema.json) into the
-        comment-matrix contract.
+        canonical comment-matrix contract row.
         """
         location = comment.get("location") or {}
         agency_notes = (
@@ -133,67 +156,61 @@ class CommentMatrixRow:
         )
         disposition = comment.get("disposition") or comment.get("comment_disposition") or ""
         resolution = comment.get("resolution") or ""
-        report_context = (
-            location.get("anchor_text")
-            or comment.get("anchor_text")
-            or comment.get("report_context")
-            or ""
-        )
         ntia_comments = comment.get("rationale") or comment.get("ntia_comments") or ""
         section = location.get("section") or comment.get("section_id") or comment.get("section") or ""
         page = location.get("page") or comment.get("page_reference") or comment.get("page") or ""
         line = location.get("line") or comment.get("line_reference") or comment.get("line") or ""
-        intent = (
-            comment.get("intent_classification")
-            or comment.get("comment_category")
-            or comment.get("category")
+
+        raw_comment_type = (
+            comment.get("comment_type")
+            or comment.get("Comment Type: Editorial/Grammar, Clarification, Technical")
             or ""
         )
-        heat_level = comment.get("severity") or comment.get("heat_level") or ""
-        resolved_against = comment.get("resolved_against_revision") or report_version
-        matched_rule_types = comment.get("matched_rule_types") or ""
-        review_status = comment.get("review_status") or "PROPOSED"
+        if raw_comment_type in COMMENT_TYPE_VALUES:
+            comment_type = raw_comment_type
+        else:
+            category = (
+                comment.get("comment_category")
+                or comment.get("category")
+                or comment.get("intent_classification")
+                or ""
+            )
+            severity = comment.get("severity") or comment.get("heat_level") or ""
+            comment_type = infer_comment_type(str(category), str(severity))
+
         confidence = comment.get("confidence") or comment.get("confidence_score") or 0.0
         provenance = comment.get("provenance_record_id") or comment.get("comment_id") or f"comment-{comment_number}"
         persona_name = comment.get("reviewer_persona_id") or comment.get("persona_name") or "NTIA engineer"
+        heat_level = comment.get("severity") or comment.get("heat_level") or ""
 
         return cls(
             comment_number=comment_number,
             persona_name=persona_name,
             agency_notes=str(agency_notes),
             agency_suggested_text_change=str(suggested),
+            comment_type=str(comment_type),
             comment_disposition=str(disposition),
             resolution=str(resolution),
-            report_context=str(report_context),
             ntia_comments=str(ntia_comments),
             report_version=str(report_version),
             section=str(section),
             page=str(page),
             line=str(line),
-            resolution_task=str(comment.get("resolution_task") or ""),
-            comment_cluster_id=str(comment.get("comment_cluster_id") or ""),
-            intent_classification=str(intent),
-            section_group=str(comment.get("section_group") or ""),
-            heat_level=str(heat_level),
-            validation_status=str(comment.get("validation_status") or "NOT_VALIDATED"),
-            validation_notes=str(comment.get("validation_notes") or ""),
-            resolved_against_revision=str(resolved_against),
-            generation_mode=str(generation_mode),
-            rule_id=str(comment.get("rule_id") or "rule-placeholder"),
-            rule_source=str(comment.get("rule_source") or "working-paper-review-engine"),
-            rule_version=str(comment.get("rule_version") or "0.0.0"),
-            rules_profile=str(comment.get("rules_profile") or "default"),
-            rules_profile_version=str(comment.get("rules_profile_version") or "0.0.0"),
-            matched_rule_types=str(matched_rule_types),
-            review_status=str(review_status),
             confidence_score=float(confidence),
             provenance_record_id=str(provenance),
-            wg_chain_comments=str(comment.get("wg_chain_comments") or ""),
+            heat_level=str(heat_level),
+            generation_mode=str(generation_mode),
         )
 
     def to_ordered_mapping(self) -> OrderedDict:
+        """
+        Return the canonical 13-column ordered mapping for spreadsheet export.
+
+        Only the columns defined in COMMENT_MATRIX_COLUMNS appear; no extra visible
+        columns are emitted.  Internal metadata fields are excluded per the
+        spectrum-systems metadata handling policy.
+        """
         agency, reviewer_initials = map_persona_identity(self.persona_name)
-        confidence = min(max(self.confidence_score, 0.0), 1.0)
         row: MutableMapping[str, Any] = OrderedDict()
         row["Comment Number"] = self.comment_number
         row["Reviewer Initials"] = reviewer_initials
@@ -202,31 +219,12 @@ class CommentMatrixRow:
         row["Section"] = self.section
         row["Page"] = self.page
         row["Line"] = self.line
+        row["Comment Type: Editorial/Grammar, Clarification, Technical"] = self.comment_type
         row["Agency Notes"] = self.agency_notes
         row["Agency Suggested Text Change"] = self.agency_suggested_text_change
-        row["WG Chain Comments"] = self.wg_chain_comments
         row["NTIA Comments"] = self.ntia_comments
         row["Comment Disposition"] = self.comment_disposition
         row["Resolution"] = self.resolution
-        row["Report Context"] = self.report_context
-        row["Resolution Task"] = self.resolution_task
-        row["Comment Cluster Id"] = self.comment_cluster_id
-        row["Intent Classification"] = self.intent_classification
-        row["Section Group"] = self.section_group
-        row["Heat Level"] = self.heat_level
-        row["Validation Status"] = self.validation_status or "NOT_VALIDATED"
-        row["Validation Notes"] = self.validation_notes
-        row["Resolved Against Revision"] = self.resolved_against_revision
-        row["Generation Mode"] = self.generation_mode
-        row["Rule Id"] = self.rule_id
-        row["Rule Source"] = self.rule_source
-        row["Rule Version"] = self.rule_version
-        row["Rules Profile"] = self.rules_profile
-        row["Rules Profile Version"] = self.rules_profile_version
-        row["Matched Rule Types"] = self.matched_rule_types
-        row["Review Status"] = self.review_status
-        row["Confidence Score"] = confidence
-        row["Provenance Record Id"] = self.provenance_record_id
         return OrderedDict((key, row[key]) for key in COMMENT_MATRIX_COLUMNS)
 
 
@@ -254,7 +252,7 @@ def rows_to_xlsx(rows: Sequence[CommentMatrixRow], path: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     workbook = Workbook()
     sheet = workbook.active
-    sheet.title = "Comment Matrix"
+    sheet.title = COMMENT_MATRIX_SHEET_NAME
     sheet.append(COMMENT_MATRIX_COLUMNS)
     for row in rows:
         ordered = row.to_ordered_mapping()

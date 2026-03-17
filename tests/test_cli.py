@@ -7,7 +7,7 @@ import openpyxl
 
 from working_paper_review_engine import contracts
 from working_paper_review_engine import cli
-from working_paper_review_engine.output_contract import COMMENT_MATRIX_COLUMNS
+from working_paper_review_engine.output_contract import COMMENT_MATRIX_COLUMNS, COMMENT_MATRIX_SHEET_NAME
 
 
 class CliOutputTests(unittest.TestCase):
@@ -22,7 +22,9 @@ class CliOutputTests(unittest.TestCase):
         exit_code = cli.main(["--sample", "--output-path", str(target)])
         self.assertEqual(exit_code, 0)
         workbook = openpyxl.load_workbook(target)
-        header_row = [cell.value for cell in next(workbook.active.iter_rows(min_row=1, max_row=1))]
+        self.assertIn(COMMENT_MATRIX_SHEET_NAME, workbook.sheetnames)
+        sheet = workbook[COMMENT_MATRIX_SHEET_NAME]
+        header_row = [cell.value for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
         self.assertEqual(header_row, COMMENT_MATRIX_COLUMNS)
         reviewer_comment_set_path = target.parent / "reviewer_comment_set_sample.json"
         provenance_record_path = target.parent / "provenance_record_sample.json"
