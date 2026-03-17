@@ -1,0 +1,100 @@
+name: validate
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate governance declaration exists and is valid JSON
+        run: |
+          python - <<'EOF'
+          import json, sys
+          required_fields = [
+              "system_id", "implementation_repo", "architecture_source",
+              "contract_pins", "schema_pins", "rule_version", "prompt_set_hash",
+              "evaluation_manifest_path", "last_evaluation_date",
+              "external_storage_policy", "governance_declaration_version",
+          ]
+          with open("governance/governance-declaration.json") as f:
+              decl = json.load(f)
+          missing = [k for k in required_fields if k not in decl]
+          if missing:
+              print(f"ERROR: governance-declaration.json missing fields: {missing}")
+              sys.exit(1)
+          print("governance/governance-declaration.json OK")
+          EOF
+
+      - name: Validate system metadata exists and is valid JSON
+        run: |
+          python - <<'EOF'
+          import json, sys
+          required_fields = [
+              "system_id", "repo_name", "repo_type", "architecture_layer",
+              "governance_source", "contracts_consumed", "contracts_produced",
+          ]
+          with open("governance/system-metadata.json") as f:
+              meta = json.load(f)
+          missing = [k for k in required_fields if k not in meta]
+          if missing:
+              print(f"ERROR: system-metadata.json missing fields: {missing}")
+              sys.exit(1)
+          print("governance/system-metadata.json OK")
+          EOF
+
+      - name: Validate contract declaration exists and is valid JSON
+        run: |
+          python - <<'EOF'
+          import json, sys
+          required_fields = [
+              "repo_role", "contract_mode", "standards_source_repo",
+              "consumed_artifact_types", "produced_artifact_types",
+          ]
+          with open("contracts/contract_declaration.json") as f:
+              decl = json.load(f)
+          missing = [k for k in required_fields if k not in decl]
+          if missing:
+              print(f"ERROR: contract_declaration.json missing fields: {missing}")
+              sys.exit(1)
+          print("contracts/contract_declaration.json OK")
+          EOF
+
+      - name: Validate referenced paths in governance declaration exist
+        run: |
+          python - <<'EOF'
+          import json, sys
+          from pathlib import Path
+          with open("governance/governance-declaration.json") as f:
+              decl = json.load(f)
+          paths_to_check = [
+              decl.get("evaluation_manifest_path"),
+          ]
+          failed = False
+          for p in paths_to_check:
+              if p and not Path(p).exists():
+                  print(f"ERROR: referenced path does not exist: {p}")
+                  failed = True
+          if failed:
+              sys.exit(1)
+          print("All referenced paths in governance-declaration.json exist")
+          EOF
+
+      - name: Run tests
+        run: PYTHONPATH=src python -m unittest discover tests/ -v

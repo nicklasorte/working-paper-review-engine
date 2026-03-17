@@ -45,12 +45,21 @@ Working papers often circulate without rigorous, structured review. Feedback is 
 3. Deduplicate and normalize comments into a deterministic matrix.
 4. Export the matrix and run manifest for downstream consumers.
 
+## Architecture Position
+
+This engine sits in the **review-generation** layer of the spectrum ecosystem. It is governed by the `spectrum-systems` repository, which holds canonical artifact contracts. Sibling engines that depend on its outputs include the **Comment Resolution Engine** (primary downstream consumer) and the **Study Artifact Generator**.
+
+Quick-reference normalization record: [`docs/repo-standardization-summary.md`](docs/repo-standardization-summary.md).
+
 ## Repo Structure
-- `docs/` — architecture notes, personas, taxonomy, workflows
+- `governance/` — machine-readable governance declaration and system metadata
+- `docs/` — architecture notes, personas, taxonomy, workflows, standardization summary
 - `schemas/` — JSON Schemas for comments, personas, document structure, run manifests, exports
 - `prompts/` — prompt contracts for system and personas
-- `evals/` — evaluation criteria and harness notes
+- `evals/` — evaluation manifest, criteria, and harness notes
 - `examples/` — sample inputs/outputs and guidance
+- `contracts/` — canonical contract snapshots from `spectrum-systems`; local `contract_declaration.json`
+- `tests/` — Python unittest suite (run with `PYTHONPATH=src python -m unittest discover tests/`)
 - `SYSTEMS.md` — system registry entry
 - `CLAUDE.md`, `CODEX.md`, `AGENTS.md` — agent instructions for working in this repo
 
@@ -74,6 +83,11 @@ Working papers often circulate without rigorous, structured review. Feedback is 
 - Contracts produced: `reviewer_comment_set` and `provenance_record`, plus a Comment Resolution Engine-compatible matrix export.
 - Machine-readable declaration: `contracts/contract_declaration.json`; schemas are snapshotted in `contracts/spectrum-systems/`.
 - Example artifacts live in `examples/contracts/` and are validated before export.
+
+## Governance
+- Governance declaration: `governance/governance-declaration.json` — machine-readable record of contract pins, schema pins, rule version, and evaluation manifest path.
+- System metadata: `governance/system-metadata.json` — repo type, architecture layer, upstream/downstream relationships.
+- Evaluation manifest: `evals/eval-manifest.json` — evaluation dimensions and evidence output path.
 
 ## Comment Matrix Export
 - Default CLI flag `--output-format comment-matrix` emits the comment-matrix contract (XLSX by default; CSV optional) derived from the canonical reviewer comment set.

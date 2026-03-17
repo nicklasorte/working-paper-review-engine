@@ -1,0 +1,53 @@
+{
+  "eval_manifest_version": "1.0.0",
+  "system_id": "working-paper-review-engine",
+  "description": "Evaluation manifest for the Working Paper Review Engine. Defines evaluation dimensions, expected evidence paths, and harness shape for governed evaluation.",
+  "evaluation_dimensions": [
+    {
+      "id": "anchor-accuracy",
+      "label": "Anchor Accuracy",
+      "description": "Every comment references real document text with correct page/section/element IDs.",
+      "pass_condition": "All comments have non-empty location.section, location.page, and location.anchor_text fields."
+    },
+    {
+      "id": "actionability",
+      "label": "Actionability",
+      "description": "Comments include clear suggested revisions and rationale.",
+      "pass_condition": "suggested_revision and rationale fields populated for each comment."
+    },
+    {
+      "id": "duplication-rate",
+      "label": "Duplication Rate",
+      "description": "No duplicate or near-duplicate comments in the output set.",
+      "pass_condition": "comment_id values are unique; comment_text values do not repeat."
+    },
+    {
+      "id": "persona-fidelity",
+      "label": "Persona Fidelity",
+      "description": "Tone, focus, and objections align with the selected reviewer persona.",
+      "pass_condition": "reviewer_persona_id matches a defined persona in schemas/reviewer_persona.schema.json."
+    },
+    {
+      "id": "hallucination-rate",
+      "label": "Hallucination / False-Issue Rate",
+      "description": "No invented issues or content not supported by the document.",
+      "pass_condition": "Manual or gold-set comparison; no comment_text referencing non-existent document sections."
+    },
+    {
+      "id": "export-completeness",
+      "label": "Export Completeness",
+      "description": "All required fields populate per comment_matrix_export.schema.json.",
+      "pass_condition": "Output validates against schemas/comment_matrix_export.schema.json with no missing required columns."
+    },
+    {
+      "id": "schema-validation",
+      "label": "Schema Validation",
+      "description": "reviewer_comment_set and provenance_record outputs validate against canonical contracts.",
+      "pass_condition": "jsonschema validation passes for all output artifacts."
+    }
+  ],
+  "evidence_output_path": "outputs/eval-evidence/",
+  "gold_examples_path": "examples/contracts/",
+  "harness_notes": "Full evaluation harness is pending implementation. Current scaffold defines expected shape for future automation. Use tests/test_contracts_validation.py as the baseline validation harness.",
+  "last_evaluated": null
+}
